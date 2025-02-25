@@ -1,16 +1,41 @@
-name: Run Tests
+name: CI and Notebook Execution
+
 on: [push]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: Install dependencies
+
+      - name: Install dependencies for tests
         run: |
-          pip install numpy pandas scikit-learn
+          pip install numpy pandas scikit-learn matplotlib
+
       - name: Run test script
         run: python test_script.py
+
+  run-notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies for Notebook
+        run: |
+          pip install numpy pandas scikit-learn matplotlib notebook nbconvert wandb opencv-python Pillow
+
+      - name: Run Jupyter Notebook and Log to WandB
+        run: |
+          jupyter nbconvert --to notebook --execute lab5-kaggle.ipynb --output executed_notebook.ipynb
